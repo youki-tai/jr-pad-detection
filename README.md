@@ -3,3 +3,4 @@
 
 ## Documents
 - [環境設定](https://github.com/tokyo-ai/aktio-yolovx/issues/1)
+- [Tutorials for Training](https://github.com/tokyo-ai/aktio-yolovx/issues/2) 
