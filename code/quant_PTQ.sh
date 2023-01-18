@@ -24,7 +24,7 @@ BATCH=8
 Q_DIR='quantized'
 
 MODE='calib'
-python quant.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH} -d ${GPU_NUM} --conf 0.001 --quant_mode ${MODE} --quant_dir ${Q_DIR} # --nndct_parse_debug 1
+python tools/quant.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH} -d ${GPU_NUM} --conf 0.001 --quant_mode ${MODE} --quant_dir ${Q_DIR} # --nndct_parse_debug 1
 
 MODE='test'
-python quant.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH} -d ${GPU_NUM} --conf 0.001 --quant_mode ${MODE} --quant_dir ${Q_DIR} # --nndct_parse_debug 1
+python tools/quant.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH} -d ${GPU_NUM} --conf 0.001 --quant_mode ${MODE} --quant_dir ${Q_DIR} # --nndct_parse_debug 1

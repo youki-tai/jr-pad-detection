@@ -15,10 +15,11 @@
 # train
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 GPU_NUM=1
-BATCH_SIZE=32
+BATCH_SIZE=8
+# model definition + training prameters settings
 CFG=exps/example/custom/yolox_m_tt100k_float.py
-python train.py -f ${CFG} -d ${GPU_NUM} -b 8 --fp16
-
+# run training
+python tools/train.py -f ${CFG} -d ${GPU_NUM} -b 8 --fp16
 WEIGHTS=./float/best_ckpt.pth
 
 # eval

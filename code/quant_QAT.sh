@@ -18,4 +18,4 @@ GPU_NUM=1
 BATCH_SIZE=2
 CFG=exps/example/custom/yolox_m_tt100k_qat.py
 pre_train=./qat/best_ckpt.pth
-python train.py -f ${CFG} -d ${GPU_NUM} -b ${BATCH_SIZE}
+python tools/train.py -f ${CFG} -d ${GPU_NUM} -b ${BATCH_SIZE}

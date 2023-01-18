@@ -23,12 +23,12 @@ WEIGHTS=aktio/aktio_sample_1202.pth
 
 # eval
 echo "testing the qat model"
-python eval.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH_SIZE} -d 1 --conf 0.001 # --fp16 --fuse
+python tools/eval.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH_SIZE} -d 1 --conf 0.001 # --fp16 --fuse
 
 # convert
 echo "converted qat model"
 CVT_DIR=converted_qat_results
-python convert_qat.py -f ${CFG} -c ${WEIGHTS} --cvt_dir ${CVT_DIR}
+python tools/convert_qat.py -f ${CFG} -c ${WEIGHTS} --cvt_dir ${CVT_DIR}
 
 
 ############################# test the converted results #############################
@@ -41,9 +41,9 @@ echo "test converted qat model"
 export W_QUANT=1
 
 MODE='test'
-python quant.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode ${MODE} --quant_dir ${Q_DIR} --nndct_equalization=False --nndct_param_corr=False
+python tools/quant.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode ${MODE} --quant_dir ${Q_DIR} --nndct_equalization=False --nndct_param_corr=False
 
 echo "dump xmodel for deployment"
 MODE='test'
-python quant.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode ${MODE} --quant_dir ${Q_DIR} --is_dump --nndct_equalization=False --nndct_param_corr=False
+python tools/quant.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode ${MODE} --quant_dir ${Q_DIR} --is_dump --nndct_equalization=False --nndct_param_corr=False
 
