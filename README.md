@@ -1,4 +1,4 @@
-# aktio-yolovx
+# aktio-yolox
 アクティオ案件のFPGA実装周り
 
 ## Requirements
