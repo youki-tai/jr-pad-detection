@@ -5,8 +5,7 @@ import vitis_ai_yolovx_wr
 
 cap = cv2.VideoCapture(0)
 #cap = cv2.VideoCapture("xmodel_bolt/bolt_sample_416.avi")
-
-yolovx_obj = vitis_ai_yolovx_wr.yolovx_wr("tsd_yolox_pt.xmodel")
+yolovx_obj = vitis_ai_yolovx_wr.yolovx_wr("models/official-yolox-m/tsd_yolox_pt.xmodel")
 
 while True:
     retval,frame = cap.read()

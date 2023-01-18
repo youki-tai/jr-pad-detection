@@ -1,0 +1,2 @@
+050ddcf35cd58c1ca2435f17b7fc66f9  tsd_yolox_pt.prototxt
+0a9d5113da21a93f6a6f27e7d294b72f  tsd_yolox_pt.xmodel
