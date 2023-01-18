@@ -4,4 +4,7 @@
 ## Documents
 - [Environment Settings](https://github.com/tokyo-ai/aktio-yolovx/issues/1)
 - [Tutorials for Training](https://github.com/tokyo-ai/aktio-yolovx/issues/2) 
-- [Tutorials for Deployment](https://github.com/tokyo-ai/aktio-yolovx/issues/3)
+- Deployment Tutorials
+  - [Official Tutorials](https://github.com/tokyo-ai/aktio-yolovx/issues/3)
+  - [Deployment with Camera](https://github.com/tokyo-ai/aktio-yolox/issues/4)
+
