@@ -15,7 +15,10 @@
 # train
 export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
-CFG=exps/example/custom/yolox_m_tt100k_float.py
+# yolox-s
+CFG=exps/example/custom/yolox_s_tt100k_float.py
+# yolox-m
+# CFG=exps/example/custom/yolox_m_tt100k_float.py
 
 # demo
 IMG=../data/tt100k/val2017/27179.jpg

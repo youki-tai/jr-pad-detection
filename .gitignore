@@ -12,7 +12,8 @@ __pycache__/
 *$py.class
 
 # C extensions
-code/*.so
+code/**/*.so
+
 
 # Distribution / packaging
 .Python
