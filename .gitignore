@@ -5,6 +5,7 @@
 # dataset
 *.zip
 code/datasets/data
+code/aktio_datasets/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -32,6 +32,7 @@ def get_exp_by_file(exp_file):
 
 
 def get_exp_by_name(exp_name):
+    """VitisAIでは使用していない"""
     import yolox
 
     yolox_path = os.path.dirname(os.path.dirname(yolox.__file__))
@@ -51,6 +52,7 @@ def get_exp_by_name(exp_name):
 
 def get_exp(exp_file, exp_name):
     """
+    Vitis AIではexp_nameは使用していない(常にNone)
     get Exp object by file or name. If exp_file and exp_name
     are both provided, get Exp by exp_file.
 
