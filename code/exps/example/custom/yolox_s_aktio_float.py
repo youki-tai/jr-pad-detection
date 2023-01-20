@@ -11,9 +11,13 @@ class Exp(MyExp):
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
 
         # Define yourself dataset path
-        self.data_dir = "datasets/data/tt100k"
-        self.train_ann = "tt100k_in_coco_format_train.json"
-        self.val_ann = "tt100k_in_coco_format_test.json"
+        # datasize
+        self.input_size = (480, 640)  # (height, width)
+        self.test_size = (480, 640)  # (height, width)
+        # path
+        self.data_dir = "aktio_datasets/AKTIO_1202_alldata_COCO_format"
+        self.train_ann = "instances_train2017.json"
+        self.val_ann = "instances_val2017.json"
 
         self.num_classes = 1
 
@@ -22,10 +26,11 @@ class Exp(MyExp):
         # self.max_epoch = 300
         self.data_num_workers = 4
         self.eval_interval = 1
+        
+
 
 
     def get_model(self):
-        # print("Hello WOrld########################")
         from yolox.models import YOLOX, YOLOXHead
         # 1st conv: in-channel=12
         from yolox.models.yolo_pafpn import YOLOPAFPN

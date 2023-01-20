@@ -16,7 +16,7 @@
 export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
 # aktio-yolox-s
-CFG=exps/example/custom/yolox_s_tt100k_float.py
+CFG=exps/example/custom/yolox_s_aktio_float.py
 # yolox-m
 # CFG=exps/example/custom/yolox_m_tt100k_float.py
 

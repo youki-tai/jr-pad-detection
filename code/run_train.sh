@@ -13,14 +13,21 @@
 # limitations under the License.
 
 # train
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0
+# export CUDA_VISIBLE_DEVICES=0,1,2,3
 GPU_NUM=1
 BATCH_SIZE=8
-# model definition + training prameters settings
-CFG=exps/example/custom/yolox_m_tt100k_float.py
+
+# aktio-yolox-s
+CFG=exps/example/custom/yolox_s_aktio_float.py
+# Vitis AI YOLOX-m specification
+# CFG=exps/example/custom/yolox_m_tt100k_float.py
+
+
 # run training
 python tools/train.py -f ${CFG} -d ${GPU_NUM} -b 8 --fp16
-WEIGHTS=./float/best_ckpt.pth
+WEIGHTS=./aktio-trained-models/best_ckpt.pth
+# WEIGHTS=./float/best_ckpt.pth
 
 # eval
 # python tools/eval.py -f ${CFG} -c ${WEIGHTS} -b ${BATCH_SIZE} -d 1 --conf 0.001 # --fp16 --fuse
