@@ -15,9 +15,12 @@
 export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
 
+# Aktio YOLOX-s
 CFG=exps/example/custom/yolox_m_tt100k_quant.py
+# Vitis AI YOLOX-m 
+# CFG=exps/example/custom/yolox_m_tt100k_quant.py
 
-WEIGHTS=YOLOX_outputs/yolox_m_tt100k_float/best_ckpt.pth
+WEIGHTS=YOLOX_outputs/yolox_s_aktio_float/best_ckpt.pth
 
 export W_QUANT=1
 BATCH=8

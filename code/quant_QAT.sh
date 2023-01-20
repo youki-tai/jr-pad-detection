@@ -16,6 +16,13 @@
 export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
 BATCH_SIZE=2
-CFG=exps/example/custom/yolox_m_tt100k_qat.py
-pre_train=./qat/best_ckpt.pth
+
+# Aktio YOLOX-s
+CFG=exps/example/custom/yolox_s_aktio_qat.py
+# Vitis AI YOLOX-m 
+# CFG=exps/example/custom/yolox_m_tt100k_qat.py
+
+# WEIGHTS=YOLOX_outputs/yolox_s_aktio_float/best_ckpt.pth
+# pre_train=YOLOX_outputs/yolox_s_aktio_float/best_ckpt.pth
+
 python tools/train.py -f ${CFG} -d ${GPU_NUM} -b ${BATCH_SIZE}

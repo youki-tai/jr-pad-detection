@@ -16,7 +16,9 @@
 export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
 BATCH_SIZE=8
+
 CFG=exps/example/custom/yolox_m_tt100k_qat.py
+# CFG=exps/example/custom/yolox_m_tt100k_qat.py
 
 # WEIGHTS=YOLOX_outputs/yolox_m_tt100k_qat/best_ckpt.pth
 WEIGHTS=aktio/aktio_sample_1202.pth

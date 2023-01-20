@@ -21,11 +21,14 @@ class Exp(MyExp):
 
         self.num_classes = 1
 
-        self.warmup_epochs = 5
+        self.warmup_epochs = 1
         self.max_epoch = 1
-        # self.max_epoch = 300
+        # self.max_epoch = 60
         self.data_num_workers = 4
+        self.is_qat = True
+        self.float_ckpt = 'YOLOX_outputs/yolox_s_aktio_float/best_ckpt.pth'
         self.eval_interval = 1
+        self.calib_dir = 'quantized'
         
 
     def get_model(self):
