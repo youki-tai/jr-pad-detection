@@ -15,13 +15,17 @@
 # train
 export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
-# yolox-s
+# aktio-yolox-s
 CFG=exps/example/custom/yolox_s_tt100k_float.py
 # yolox-m
 # CFG=exps/example/custom/yolox_m_tt100k_float.py
 
 # demo
-IMG=../data/tt100k/val2017/27179.jpg
+# aktio-yolo-s
+IMG=aktio_datasets/AKTIO_1202_alldata_COCO_format/val2017/000000000001.jpg
+# yolo-m
+# IMG=datasets/data/tt100k/val2017/27179.jpg
+
 
 # FLOAT DEMO
 export W_QUANT=0 # float model
