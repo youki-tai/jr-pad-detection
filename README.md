@@ -2,8 +2,8 @@
 アクティオ案件のFPGA実装周り
 
 ## Requirements
-- Ubuntu 20.04 lts(or 18.04 lts)
-- GPU(Tutorials use `RTX 2080Ti`)
+- Ubuntu 20.04 lts (or 18.04 lts)
+- GPU (Tutorials use `RTX 2080Ti`)
 - Memory: 32Gi~
 
 
