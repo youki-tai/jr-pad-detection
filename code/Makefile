@@ -4,9 +4,9 @@ export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
 
 # train(float) ---------------------------------------------------
-FLOAT_BATCH_SIZE=8
-FLOAT_CFG=exps/aktio/vitis_ai_yolox/yolox_s_float.py
-FLOAT_EXPERIMENT_NAME=vitis_ai_yolox_s_float
+FLOAT_BATCH_SIZE=64
+FLOAT_CFG=exps/aktio/vitis_ai_yolox/yolox_nano_float.py
+FLOAT_EXPERIMENT_NAME=vitis_ai_yolox_nano_float
 
 # PTQ ------------------------------------------------------------
 PTQ_BATCH=8
