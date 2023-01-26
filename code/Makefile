@@ -26,6 +26,21 @@ EVAL_BATCH_SIZE=16
 EVAL_CFG=exps/aktio/yolox_s_float.py
 EVAL_WEIGHTS=./aktio-trained-model-2023-01-26/yolox_s_aktio_qat/best_ckpt.pth
 
+# demo -----------------------------------------------------------
+# 1: quant 0: float
+DEMO_IS_QUANT=0
+DEMO_CFG=exps/aktio/vitis_ai_yolox/yolox_s_float.py
+# DEMO_OUTPUT_DIR
+DEMO_WEIGHTS=aktio-trained-model-2023-01-26/yolox_s_aktio_float/best_ckpt.pth
+# image
+DEMO_INPUT_TYPE=image
+DEMO_INPUT=aktio_datasets/AKTIO_1202_alldata_COCO_format/val2017/000000000003.jpg
+# video
+# DEMO_INPUT_TYPE=video
+# DEMO_INPUT=./aktio_test_mv.mp4
+CONFIDENCE=0.6
+NMS=0.45
+
 # compile -----------------------------------------------------------
 QAT_WEIGHTS=YOLOX_outputs/yolox_s_aktio_qat/best_ckpt.pth
 CVT_DIR=aktio_converted_qat
@@ -46,6 +61,11 @@ ptq:
 qat: export W_QUANT=1
 qat:
 	python tools/train.py -expn ${QAT_EXPERIMENT_NAME} -f ${QAT_CFG} -d ${GPU_NUM} -b ${QAT_BATCH_SIZE}
+
+
+demo: export W_QUANT=${DEMO_IS_QUANT}
+demo:
+	python tools/demo_sign.py ${DEMO_INPUT_TYPE} -f ${DEMO_CFG} -c ${DEMO_WEIGHTS} --path ${DEMO_INPUT} --conf ${CONFIDENCE} --nms ${NMS} --save_result --device gpu
 
 
 eval:

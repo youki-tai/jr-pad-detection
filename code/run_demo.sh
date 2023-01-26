@@ -20,11 +20,6 @@ CFG=exps/example/custom/yolox_s_aktio_float.py
 # yolox-m
 # CFG=exps/example/custom/yolox_m_tt100k_float.py
 
-# demo
-# aktio-yolo-s
-IMG=aktio_datasets/AKTIO_1202_alldata_COCO_format/val2017/000000000003.jpg
-# yolo-m
-# IMG=datasets/data/tt100k/val2017/27179.jpg
 
 
 # FLOAT DEMO
