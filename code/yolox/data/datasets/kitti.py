@@ -65,7 +65,10 @@ class KITTIDetection(Dataset):
         super().__init__(img_size)
         if data_dir is None:
             data_dir = os.path.join(get_yolox_datadir(), "KITTI")
-        assert image_set in ["train.txt", "val.txt"], "Image_set of KITTI should be 'train' or 'val'!"
+        assert image_set in [
+            "train.txt",
+            "val.txt",
+        ], "Image_set of KITTI should be 'train' or 'val'!"
         # self._year = '2017'
         self.root = data_dir
         self.image_set = image_set
@@ -77,7 +80,7 @@ class KITTIDetection(Dataset):
         self.label_dir = os.path.join(self.root, "training", "label_2")
 
         # self.classes = ('Car', 'Pedestrian', 'Cyclist')
-        self.classes = ('Car',)
+        self.classes = ("Car",)
         self.class2id = dict(zip(self.classes, range(len(self.classes))))
         self.ids = list()
         split_path = os.path.join(self.root, "ImageSets", image_set)
@@ -93,12 +96,12 @@ class KITTIDetection(Dataset):
     def __len__(self):
         return len(self.ids)
 
-    '''
+    """
     def _record_img_shapes(self):
         print("Collecting image shape info...")
         img_infos = [(384, 1248)] * len(self.ids)
         return img_infos
-    '''
+    """
 
     def _record_img_shapes(self):
         print("Collecting image shape info...")
@@ -111,7 +114,7 @@ class KITTIDetection(Dataset):
     def _load_coco_annotations(self):
         return [self.load_anno_from_ids(_ids) for _ids in range(len(self.ids))]
 
-    def eval(self, results_dir='predictions'):
+    def eval(self, results_dir="predictions"):
         # logger.info("==> Loading detections and GTs...")
         print("==> Loading detections and GTs...")
         img_ids = [int(id) for id in self.ids]
@@ -119,12 +122,14 @@ class KITTIDetection(Dataset):
         gt_annos = get_label_annos(self.label_dir, img_ids)
 
         # test_id = {'Car': 0, 'Pedestrian':1, 'Cyclist': 2}
-        test_id = {'Car': 0}
+        test_id = {"Car": 0}
 
-        results_str = ''
+        results_str = ""
         results_dict = {}
         for category in self.classes:
-            cls_str, cls_dict = get_official_eval_result(gt_annos, dt_annos, test_id[category])
+            cls_str, cls_dict = get_official_eval_result(
+                gt_annos, dt_annos, test_id[category]
+            )
             results_str += cls_str
             results_dict.update(cls_dict)
         # print(results_str)
@@ -182,11 +187,11 @@ class KITTIDetection(Dataset):
     def load_anno_from_ids(self, index):
         img_id = self.ids[index]
         lab_path = self._annopath % img_id
-        res = np.empty((0,5)) # xmin, ymin, xmax, ymax, cls_id
-        with open(lab_path, 'r') as fr:
+        res = np.empty((0, 5))  # xmin, ymin, xmax, ymax, cls_id
+        with open(lab_path, "r") as fr:
             lines = fr.readlines()
         for line in lines:
-            line = line.strip().split(' ')
+            line = line.strip().split(" ")
             if line[0] not in self.classes:
                 continue
             cls_id = self.class2id[line[0]]
@@ -315,8 +320,10 @@ class KITTIDetection(Dataset):
         name = self.image_set
         annopath = os.path.join(self.root, "training", "label_2", "{:s}.txt")
         imagesetfile = os.path.join(self.root, "ImageSets", name)
-        cachedir = os.path.join(self.root, "annotations_cache", "VOC" + self._year, name)
-        
+        cachedir = os.path.join(
+            self.root, "annotations_cache", "VOC" + self._year, name
+        )
+
         if not os.path.exists(cachedir):
             os.makedirs(cachedir)
         aps = []

@@ -19,6 +19,7 @@
 import argparse
 from yolox.exp import get_exp
 
+
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Eval")
     parser.add_argument("-expn", "--experiment-name", type=str, default=None)
@@ -32,7 +33,9 @@ def make_parser():
         help="pls input your expriment description file",
     )
     parser.add_argument("-c", "--ckpt", default=None, type=str, help="ckpt for eval")
-    parser.add_argument("--cvt_dir", default=None, type=str, help="directory for the converted results")
+    parser.add_argument(
+        "--cvt_dir", default=None, type=str, help="directory for the converted results"
+    )
     return parser
 
 

@@ -34,7 +34,7 @@ from yolox.utils import (
     synchronize,
     time_synchronized,
     is_parallel,
-    xyxy2xywh
+    xyxy2xywh,
 )
 
 
@@ -73,7 +73,7 @@ class COCOQEvaluator:
         decoder=None,
         test_size=None,
         is_dump=False,
-        device=torch.device('cuda'),
+        device=torch.device("cuda"),
     ):
         """
         COCO average precision (AP) Evaluation. Iterate inference on the test dataset
@@ -120,7 +120,7 @@ class COCOQEvaluator:
 
                 ## for dump check data
                 if is_dump:
-                    return None, ''
+                    return None, ""
                 if is_parallel(float_model):
                     outputs = float_model.module.head.postprocess(outputs)
                 else:

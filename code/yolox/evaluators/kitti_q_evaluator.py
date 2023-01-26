@@ -28,7 +28,14 @@ import numpy as np
 
 import torch
 
-from yolox.utils import gather, is_main_process, postprocess, synchronize, time_synchronized, is_parallel
+from yolox.utils import (
+    gather,
+    is_main_process,
+    postprocess,
+    synchronize,
+    time_synchronized,
+    is_parallel,
+)
 
 
 class KITTIQEvaluator:
@@ -70,7 +77,7 @@ class KITTIQEvaluator:
         decoder=None,
         test_size=None,
         is_dump=False,
-        device=torch.device('cuda'),
+        device=torch.device("cuda"),
     ):
         """
         VOC average precision (AP) Evaluation. Iterate inference on the test dataset
@@ -114,8 +121,10 @@ class KITTIQEvaluator:
                 imgs = imgs.to(device)
                 outputs = quant_model(imgs)
 
-                if is_dump: # for dumping golden, we only need run forward() for one sample
-                    return None, ''
+                if (
+                    is_dump
+                ):  # for dumping golden, we only need run forward() for one sample
+                    return None, ""
 
                 if is_parallel(float_model):
                     outputs = float_model.module.head.postprocess(outputs)
@@ -141,19 +150,19 @@ class KITTIQEvaluator:
 
         statistics = torch.cuda.FloatTensor([inference_time, nms_time, n_samples])
 
-        '''
+        """
         if distributed:
             data_list = gather(data_list, dst=0)
             data_list = ChainMap(*data_list)
             torch.distributed.reduce(statistics, dst=0)
-        '''
+        """
 
         # eval_results = self.evaluate_prediction(data_list, statistics)
         results_str, results_dict = self.dataloader.dataset.eval()
         synchronize()
         return results_dict, results_str
 
-    def convert_to_kitti_format(self, outputs, info_imgs, ids, pred_dir='predictions'):
+    def convert_to_kitti_format(self, outputs, info_imgs, ids, pred_dir="predictions"):
         if not os.path.exists(pred_dir):
             os.makedirs(pred_dir)
         # predictions = {}
@@ -161,7 +170,7 @@ class KITTIQEvaluator:
             outputs, info_imgs[0], info_imgs[1], ids
         ):
             filename = self.dataloader.dataset.ids[img_id]
-            pred_path = os.path.join(pred_dir, filename + '.txt')
+            pred_path = os.path.join(pred_dir, filename + ".txt")
             if output is None:
                 os.system("touch {}".format(pred_path))
                 continue
@@ -169,18 +178,23 @@ class KITTIQEvaluator:
             output = output.cpu()
             bboxes = output[:, 0:4]
             # preprocessing: resize
-            scale = min(self.img_size[0] / float(img_h), self.img_size[1] / float(img_w))
+            scale = min(
+                self.img_size[0] / float(img_h), self.img_size[1] / float(img_w)
+            )
             bboxes /= scale
             cls = output[:, 6]
             scores = output[:, 4] * output[:, 5]
-            with open(pred_path, 'wt') as fw:
+            with open(pred_path, "wt") as fw:
                 for idx in range(len(output)):
                     template = "{} -10 -10 -10 {:.2f} {:.2f} {:.2f} {:.2f} -1000 -1000 -1000 -1000 -1000 -1000 -1000 {:.6f}\n"
-                    line = template.format(self.dataloader.dataset.classes[int(cls[idx])], *bboxes[idx].tolist(), scores[idx])
+                    line = template.format(
+                        self.dataloader.dataset.classes[int(cls[idx])],
+                        *bboxes[idx].tolist(),
+                        scores[idx]
+                    )
                     fw.write(line)
         #     predictions[int(img_id)] = (bboxes, cls, scores)
         # return predictions
-
 
     def evaluate_prediction(self, data_dict, statistics):
         if not is_main_process():

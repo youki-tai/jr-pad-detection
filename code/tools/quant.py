@@ -17,7 +17,8 @@
 # Copyright (c) Megvii, Inc. and its affiliates.
 
 import os
-if os.environ["W_QUANT"]=='1':
+
+if os.environ["W_QUANT"] == "1":
     from pytorch_nndct.apis import torch_quantizer
 
 import argparse
@@ -31,7 +32,13 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from yolox.core import launch
 from yolox.exp import get_exp
-from yolox.utils import configure_nccl, fuse_model, get_local_rank, get_model_info, setup_logger
+from yolox.utils import (
+    configure_nccl,
+    fuse_model,
+    get_local_rank,
+    get_model_info,
+    setup_logger,
+)
 
 from tqdm import tqdm
 
@@ -68,10 +75,21 @@ def make_parser():
         type=str,
         help="pls input your expriment description file",
     )
-    parser.add_argument("--quant_mode", default='calib', type=str, help="mode for quantization")
-    parser.add_argument("--quant_dir", default='quantized', type=str, help="directory for quantization")
-    parser.add_argument("--is_dump", default=False, action="store_true", help="flag to dump xmodel")
-    parser.add_argument("--fast_finetune", default=False, action="store_true", help="fast finetune for quantization")
+    parser.add_argument(
+        "--quant_mode", default="calib", type=str, help="mode for quantization"
+    )
+    parser.add_argument(
+        "--quant_dir", default="quantized", type=str, help="directory for quantization"
+    )
+    parser.add_argument(
+        "--is_dump", default=False, action="store_true", help="flag to dump xmodel"
+    )
+    parser.add_argument(
+        "--fast_finetune",
+        default=False,
+        action="store_true",
+        help="fast finetune for quantization",
+    )
     parser.add_argument("-c", "--ckpt", default=None, type=str, help="ckpt for eval")
     parser.add_argument("--conf", default=None, type=float, help="test conf")
     parser.add_argument("--nms", default=None, type=float, help="test nms threshold")
@@ -116,16 +134,21 @@ def make_parser():
 
 def feed_model_with_data(model, dataset, device, subset_len, batch_size):
     import random
+
     seed = 0
     random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     if subset_len:
         assert subset_len <= len(dataset)
-        subset = torch.utils.data.Subset(dataset, random.sample(range(0, len(dataset)), subset_len))
-    dataloader = torch.utils.data.DataLoader(subset, batch_size=batch_size, drop_last=False, shuffle=True)
+        subset = torch.utils.data.Subset(
+            dataset, random.sample(range(0, len(dataset)), subset_len)
+        )
+    dataloader = torch.utils.data.DataLoader(
+        subset, batch_size=batch_size, drop_last=False, shuffle=True
+    )
     model.to(device)
-    for cur_iter, (imgs, _, info_imgs, ids) in enumerate(tqdm(dataloader)):  
+    for cur_iter, (imgs, _, info_imgs, ids) in enumerate(tqdm(dataloader)):
         imgs = imgs.type(torch.cuda.FloatTensor)
         imgs = imgs.to(device)
         outputs = model(imgs)
@@ -164,7 +187,7 @@ def main(exp, args, num_gpu):
     if args.tsize is not None:
         exp.test_size = (args.tsize, args.tsize)
 
-    device = torch.device('cuda')
+    device = torch.device("cuda")
     if args.is_dump:
         device = torch.device("cpu")
         args.batch_size = 1
@@ -173,7 +196,9 @@ def main(exp, args, num_gpu):
     logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
     logger.info("Model Structure:\n{}".format(str(model)))
 
-    evaluator = exp.get_evaluator(args.batch_size, is_distributed, args.test, args.legacy, quantized=True)
+    evaluator = exp.get_evaluator(
+        args.batch_size, is_distributed, args.test, args.legacy, quantized=True
+    )
 
     # torch.cuda.set_device(rank)
     # model.cuda(rank)
@@ -192,31 +217,56 @@ def main(exp, args, num_gpu):
         logger.info("loaded checkpoint done.")
 
     import copy
+
     float_model = copy.deepcopy(model)
-    if os.environ["W_QUANT"]=='1':
+    if os.environ["W_QUANT"] == "1":
         dummy_input = torch.randn([1, 3, exp.test_size[0], exp.test_size[1]]).to(device)
-        quantizer = torch_quantizer(args.quant_mode, model, dummy_input, output_dir=args.quant_dir, device=device)
+        quantizer = torch_quantizer(
+            args.quant_mode,
+            model,
+            dummy_input,
+            output_dir=args.quant_dir,
+            device=device,
+        )
         model = quantizer.quant_model
         model.eval()
 
     if args.fast_finetune:
-        if args.quant_mode == 'calib':
+        if args.quant_mode == "calib":
             sample_num = 2000
             fft_batch_size = 50
-            quantizer.fast_finetune(feed_model_with_data, (model, evaluator.dataloader.dataset, device, sample_num, fft_batch_size))
-        elif args.quant_mode == 'test':
+            quantizer.fast_finetune(
+                feed_model_with_data,
+                (
+                    model,
+                    evaluator.dataloader.dataset,
+                    device,
+                    sample_num,
+                    fft_batch_size,
+                ),
+            )
+        elif args.quant_mode == "test":
             quantizer.load_ft_param()
 
     trt_file = None
     decoder = None
 
     # start evaluate
-    *_, summary = evaluator.evaluate(model, float_model, is_distributed, args.fp16, trt_file, decoder, exp.test_size, 
-                                     args.is_dump, device)
-    if args.quant_mode == 'calib':
+    *_, summary = evaluator.evaluate(
+        model,
+        float_model,
+        is_distributed,
+        args.fp16,
+        trt_file,
+        decoder,
+        exp.test_size,
+        args.is_dump,
+        device,
+    )
+    if args.quant_mode == "calib":
         quantizer.export_quant_config()
         exit()
-    elif args.quant_mode == 'test' and args.is_dump:
+    elif args.quant_mode == "test" and args.is_dump:
         quantizer.export_xmodel(output_dir=args.quant_dir, deploy_check=True)
         exit()
 

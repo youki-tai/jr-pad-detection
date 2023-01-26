@@ -38,7 +38,9 @@ class Exp(MyExp):
 
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
 
-    def get_data_loader(self, batch_size, is_distributed, no_aug=False, cache_img=False):
+    def get_data_loader(
+        self, batch_size, is_distributed, no_aug=False, cache_img=False
+    ):
         from yolox.data import (
             VOCDetection,
             TrainTransform,
@@ -52,17 +54,17 @@ class Exp(MyExp):
             wait_for_the_master,
             get_local_rank,
         )
+
         local_rank = get_local_rank()
 
         with wait_for_the_master(local_rank):
             dataset = VOCDetection(
                 data_dir=os.path.join(get_yolox_datadir(), "VOCdevkit"),
-                image_sets=[('2007', 'trainval'), ('2012', 'trainval')],
+                image_sets=[("2007", "trainval"), ("2012", "trainval")],
                 img_size=self.input_size,
                 preproc=TrainTransform(
-                    max_labels=50,
-                    flip_prob=self.flip_prob,
-                    hsv_prob=self.hsv_prob),
+                    max_labels=50, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+                ),
                 cache=cache_img,
             )
 
@@ -71,9 +73,8 @@ class Exp(MyExp):
             mosaic=not no_aug,
             img_size=self.input_size,
             preproc=TrainTransform(
-                max_labels=120,
-                flip_prob=self.flip_prob,
-                hsv_prob=self.hsv_prob),
+                max_labels=120, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+            ),
             degrees=self.degrees,
             translate=self.translate,
             mosaic_scale=self.mosaic_scale,
@@ -89,9 +90,7 @@ class Exp(MyExp):
         if is_distributed:
             batch_size = batch_size // dist.get_world_size()
 
-        sampler = InfiniteSampler(
-            len(self.dataset), seed=self.seed if self.seed else 0
-        )
+        sampler = InfiniteSampler(len(self.dataset), seed=self.seed if self.seed else 0)
 
         batch_sampler = YoloBatchSampler(
             sampler=sampler,
@@ -115,7 +114,7 @@ class Exp(MyExp):
 
         valdataset = VOCDetection(
             data_dir=os.path.join(get_yolox_datadir(), "VOCdevkit"),
-            image_sets=[('2007', 'test')],
+            image_sets=[("2007", "test")],
             img_size=self.test_size,
             preproc=ValTransform(legacy=legacy),
         )

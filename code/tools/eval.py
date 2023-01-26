@@ -28,7 +28,13 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from yolox.core import launch
 from yolox.exp import get_exp
-from yolox.utils import configure_nccl, fuse_model, get_local_rank, get_model_info, setup_logger
+from yolox.utils import (
+    configure_nccl,
+    fuse_model,
+    get_local_rank,
+    get_model_info,
+    setup_logger,
+)
 
 
 def make_parser():
@@ -156,7 +162,9 @@ def main(exp, args, num_gpu):
     logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
     logger.info("Model Structure:\n{}".format(str(model)))
 
-    evaluator = exp.get_evaluator(args.batch_size, is_distributed, args.test, args.legacy)
+    evaluator = exp.get_evaluator(
+        args.batch_size, is_distributed, args.test, args.legacy
+    )
 
     torch.cuda.set_device(rank)
     model.cuda(rank)

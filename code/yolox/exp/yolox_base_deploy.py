@@ -34,7 +34,7 @@ class ExpKITTIDeploy(BaseExp):
         self.num_classes = 1
         self.depth = 1.00
         self.width = 1.00
-        self.act = 'lrelu'
+        self.act = "lrelu"
 
         # ---------------- dataloader config ---------------- #
         # set worker to 4 for shorter dataloader init time
@@ -79,7 +79,7 @@ class ExpKITTIDeploy(BaseExp):
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
 
         # -----------------  testing config ------------------ #
-        self.test_size = (384,1248)
+        self.test_size = (384, 1248)
         self.test_conf = 0.01
         self.nmsthre = 0.65
 
@@ -95,8 +95,12 @@ class ExpKITTIDeploy(BaseExp):
 
         if getattr(self, "model", None) is None:
             in_channels = [256, 512, 1024]
-            backbone = YOLOPAFPN(self.depth, self.width, in_channels=in_channels, act=self.act)
-            head = YOLOXHead(self.num_classes, self.width, in_channels=in_channels, act=self.act)
+            backbone = YOLOPAFPN(
+                self.depth, self.width, in_channels=in_channels, act=self.act
+            )
+            head = YOLOXHead(
+                self.num_classes, self.width, in_channels=in_channels, act=self.act
+            )
             self.model = YOLOX(backbone, head)
 
         self.model.apply(init_yolo)
@@ -128,9 +132,8 @@ class ExpKITTIDeploy(BaseExp):
                 image_set=self.train_set,
                 img_size=self.input_size,
                 preproc=TrainTransform(
-                    max_labels=50,
-                    flip_prob=self.flip_prob,
-                    hsv_prob=self.hsv_prob),
+                    max_labels=50, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+                ),
                 cache=cache_img,
             )
 
@@ -139,9 +142,8 @@ class ExpKITTIDeploy(BaseExp):
             mosaic=not no_aug,
             img_size=self.input_size,
             preproc=TrainTransform(
-                max_labels=120,
-                flip_prob=self.flip_prob,
-                hsv_prob=self.hsv_prob),
+                max_labels=120, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+            ),
             degrees=self.degrees,
             translate=self.translate,
             mosaic_scale=self.mosaic_scale,
@@ -182,7 +184,7 @@ class ExpKITTIDeploy(BaseExp):
 
         if rank == 0:
             size_factor = self.input_size[1] * 1.0 / self.input_size[0]
-            if not hasattr(self, 'random_size'):
+            if not hasattr(self, "random_size"):
                 min_size = int(self.input_size[0] / 32) - self.multiscale_range
                 max_size = int(self.input_size[0] / 32) + self.multiscale_range
                 self.random_size = (min_size, max_size)
@@ -281,7 +283,9 @@ class ExpKITTIDeploy(BaseExp):
 
         return val_loader
 
-    def get_evaluator(self, batch_size, is_distributed, testdev=False, legacy=False, quantized=False):
+    def get_evaluator(
+        self, batch_size, is_distributed, testdev=False, legacy=False, quantized=False
+    ):
         if quantized:
             from yolox.evaluators import KITTIQEvaluator as KITTIEvaluator
         else:
@@ -309,7 +313,7 @@ class ExpDeploy(BaseExp):
         self.num_classes = 80
         self.depth = 1.00
         self.width = 1.00
-        self.act = 'lrelu'
+        self.act = "lrelu"
 
         # ---------------- dataloader config ---------------- #
         # set worker to 4 for shorter dataloader init time
@@ -362,8 +366,9 @@ class ExpDeploy(BaseExp):
         from yolox.models.yolox_deploy import YOLOX
         from yolox.models.yolo_pafpn_deploy import YOLOPAFPN
         from yolox.models.yolo_head_deploy import YOLOXHead
-        #from yolox.models import YOLOX, YOLOXHead
-        #from yolox.models.yolo_pafpn_deploy import YOLOPAFPN
+
+        # from yolox.models import YOLOX, YOLOXHead
+        # from yolox.models.yolo_pafpn_deploy import YOLOPAFPN
 
         def init_yolo(M):
             for m in M.modules():
@@ -373,8 +378,12 @@ class ExpDeploy(BaseExp):
 
         if getattr(self, "model", None) is None:
             in_channels = [256, 512, 1024]
-            backbone = YOLOPAFPN(self.depth, self.width, in_channels=in_channels, act=self.act)
-            head = YOLOXHead(self.num_classes, self.width, in_channels=in_channels, act=self.act)
+            backbone = YOLOPAFPN(
+                self.depth, self.width, in_channels=in_channels, act=self.act
+            )
+            head = YOLOXHead(
+                self.num_classes, self.width, in_channels=in_channels, act=self.act
+            )
             self.model = YOLOX(backbone, head)
 
         self.model.apply(init_yolo)
@@ -406,9 +415,8 @@ class ExpDeploy(BaseExp):
                 json_file=self.train_ann,
                 img_size=self.input_size,
                 preproc=TrainTransform(
-                    max_labels=50,
-                    flip_prob=self.flip_prob,
-                    hsv_prob=self.hsv_prob),
+                    max_labels=50, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+                ),
                 cache=cache_img,
             )
 
@@ -417,9 +425,8 @@ class ExpDeploy(BaseExp):
             mosaic=not no_aug,
             img_size=self.input_size,
             preproc=TrainTransform(
-                max_labels=120,
-                flip_prob=self.flip_prob,
-                hsv_prob=self.hsv_prob),
+                max_labels=120, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+            ),
             degrees=self.degrees,
             translate=self.translate,
             mosaic_scale=self.mosaic_scale,
@@ -460,7 +467,7 @@ class ExpDeploy(BaseExp):
 
         if rank == 0:
             size_factor = self.input_size[1] * 1.0 / self.input_size[0]
-            if not hasattr(self, 'random_size'):
+            if not hasattr(self, "random_size"):
                 min_size = int(self.input_size[0] / 32) - self.multiscale_range
                 max_size = int(self.input_size[0] / 32) + self.multiscale_range
                 self.random_size = (min_size, max_size)
@@ -559,7 +566,9 @@ class ExpDeploy(BaseExp):
 
         return val_loader
 
-    def get_evaluator(self, batch_size, is_distributed, testdev=False, legacy=False, quantized=False):
+    def get_evaluator(
+        self, batch_size, is_distributed, testdev=False, legacy=False, quantized=False
+    ):
         if quantized:
             from yolox.evaluators import COCOQEvaluator as COCOEvaluator
         else:

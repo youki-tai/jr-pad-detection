@@ -34,7 +34,7 @@ from yolox.utils import (
     synchronize,
     time_synchronized,
     is_parallel,
-    xyxy2xywh
+    xyxy2xywh,
 )
 
 

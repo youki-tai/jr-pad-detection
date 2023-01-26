@@ -29,6 +29,6 @@ class Exp(MyExp):
         self.num_classes = 1
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         self.is_qat = True
-        self.float_ckpt = 'YOLOX_outputs/yolox_s_deploy/epoch_300_ckpt.pth'
-        self.calib_dir = 'quantized'
+        self.float_ckpt = "YOLOX_outputs/yolox_s_deploy/epoch_300_ckpt.pth"
+        self.calib_dir = "quantized"
         self.eval_interval = 10000

@@ -40,7 +40,7 @@ from yolox.utils import (
     occupy_mem,
     save_checkpoint,
     setup_logger,
-    synchronize
+    synchronize,
 )
 
 
@@ -195,7 +195,9 @@ class Trainer:
 
     def after_train(self):
         logger.info(
-            "Training of experiment is done and the best AP is {:.2f}".format(self.best_ap * 100)
+            "Training of experiment is done and the best AP is {:.2f}".format(
+                self.best_ap * 100
+            )
         )
 
     def before_epoch(self):
@@ -217,7 +219,7 @@ class Trainer:
         self.save_ckpt(ckpt_name="latest")
 
         if (self.epoch + 1) % self.exp.eval_interval == 0:
-            #all_reduce_norm(self.model)
+            # all_reduce_norm(self.model)
             self.evaluate_and_save_model()
 
     def before_iter(self):
@@ -313,8 +315,10 @@ class Trainer:
             if is_parallel(evalmodel):
                 evalmodel = evalmodel.module
 
-        ap50_95, ap50, summary = self.exp.eval(evalmodel, self.evaluator, self.is_distributed)
-        #_, summary = self.exp.eval(evalmodel, self.evaluator, self.is_distributed)
+        ap50_95, ap50, summary = self.exp.eval(
+            evalmodel, self.evaluator, self.is_distributed
+        )
+        # _, summary = self.exp.eval(evalmodel, self.evaluator, self.is_distributed)
         self.model.train()
         if self.rank == 0:
             self.tblogger.add_scalar("val/COCOAP50", ap50, self.epoch + 1)

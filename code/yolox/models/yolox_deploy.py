@@ -40,7 +40,9 @@ class YOLOX(nn.Module):
 
         self.backbone = backbone
         self.head = head
-        self.quant_in = nndct_nn.QuantStub() # the end of the quantized model is defined by quant_out at YOLOXHead (yolox_head_deploy.py)
+        self.quant_in = (
+            nndct_nn.QuantStub()
+        )  # the end of the quantized model is defined by quant_out at YOLOXHead (yolox_head_deploy.py)
 
     def forward(self, x, targets=None):
         # fpn output content features of [dark3, dark4, dark5]
@@ -64,4 +66,3 @@ class YOLOX(nn.Module):
             outputs = self.head(fpn_outs)
 
         return outputs
-

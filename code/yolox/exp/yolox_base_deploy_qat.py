@@ -36,7 +36,7 @@ class ExpKITTIDeployQat(BaseExp):
         self.num_classes = 1
         self.depth = 1.00
         self.width = 1.00
-        self.act = 'lrelu'
+        self.act = "lrelu"
 
         # ---------------- dataloader config ---------------- #
         # set worker to 4 for shorter dataloader init time
@@ -81,14 +81,14 @@ class ExpKITTIDeployQat(BaseExp):
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
 
         # -----------------  testing config ------------------ #
-        self.test_size = (384,1248)
+        self.test_size = (384, 1248)
         self.test_conf = 0.01
         self.nmsthre = 0.65
 
         # QAT
         self.is_qat = False
-        self.float_ckpt = ''
-        self.calib_dir = ''
+        self.float_ckpt = ""
+        self.calib_dir = ""
 
     def get_model(self):
         from yolox.models.yolox_deploy import YOLOX
@@ -103,8 +103,12 @@ class ExpKITTIDeployQat(BaseExp):
 
         if getattr(self, "model", None) is None:
             in_channels = [256, 512, 1024]
-            backbone = YOLOPAFPN(self.depth, self.width, in_channels=in_channels, act=self.act)
-            head = YOLOXHead(self.num_classes, self.width, in_channels=in_channels, act=self.act)
+            backbone = YOLOPAFPN(
+                self.depth, self.width, in_channels=in_channels, act=self.act
+            )
+            head = YOLOXHead(
+                self.num_classes, self.width, in_channels=in_channels, act=self.act
+            )
             self.model = YOLOX(backbone, head)
 
         self.model.apply(init_yolo)
@@ -113,23 +117,30 @@ class ExpKITTIDeployQat(BaseExp):
         if self.is_qat:
             if self.float_ckpt:
                 ckpt = torch.load(self.float_ckpt)
-                print('Loading float model weight for QAT from {}'.format(self.float_ckpt))
+                print(
+                    "Loading float model weight for QAT from {}".format(self.float_ckpt)
+                )
                 self.model.load_state_dict(ckpt["model"])
             dummy_input = torch.randn([1, 3, 384, 1248], dtype=torch.float32).cuda()
-            self.qat_processor = QatProcessor(self.model, dummy_input, bitwidth=8, mix_bit=False)
+            self.qat_processor = QatProcessor(
+                self.model, dummy_input, bitwidth=8, mix_bit=False
+            )
             self.model = self.qat_processor.trainable_model(calib_dir=self.calib_dir)
 
         return self.model
 
     def convert_qat(self, qat_model, ckpt_path, cvt_dir):
         print("loading checkpoint from {}".format(ckpt_path))
-        ckpt = torch.load(ckpt_path) 
+        ckpt = torch.load(ckpt_path)
         qat_model.load_state_dict(ckpt["model"])
-        deployable_net = self.qat_processor.convert_to_deployable(qat_model, output_dir=cvt_dir)
+        deployable_net = self.qat_processor.convert_to_deployable(
+            qat_model, output_dir=cvt_dir
+        )
         import copy
+
         cvt_ckpt = copy.deepcopy(ckpt)
         cvt_ckpt["model"] = deployable_net.state_dict()
-        cvt_path = os.path.join(cvt_dir, 'converted_qat.pth')
+        cvt_path = os.path.join(cvt_dir, "converted_qat.pth")
         torch.save(cvt_ckpt, cvt_path)
         print("Save converted QAT results in {}".format(cvt_dir))
 
@@ -158,9 +169,8 @@ class ExpKITTIDeployQat(BaseExp):
                 image_set=self.train_set,
                 img_size=self.input_size,
                 preproc=TrainTransform(
-                    max_labels=50,
-                    flip_prob=self.flip_prob,
-                    hsv_prob=self.hsv_prob),
+                    max_labels=50, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+                ),
                 cache=cache_img,
             )
 
@@ -169,9 +179,8 @@ class ExpKITTIDeployQat(BaseExp):
             mosaic=not no_aug,
             img_size=self.input_size,
             preproc=TrainTransform(
-                max_labels=120,
-                flip_prob=self.flip_prob,
-                hsv_prob=self.hsv_prob),
+                max_labels=120, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+            ),
             degrees=self.degrees,
             translate=self.translate,
             mosaic_scale=self.mosaic_scale,
@@ -212,7 +221,7 @@ class ExpKITTIDeployQat(BaseExp):
 
         if rank == 0:
             size_factor = self.input_size[1] * 1.0 / self.input_size[0]
-            if not hasattr(self, 'random_size'):
+            if not hasattr(self, "random_size"):
                 min_size = int(self.input_size[0] / 32) - self.multiscale_range
                 max_size = int(self.input_size[0] / 32) + self.multiscale_range
                 self.random_size = (min_size, max_size)
@@ -252,7 +261,9 @@ class ExpKITTIDeployQat(BaseExp):
                 if hasattr(v, "bias") and isinstance(v.bias, nn.Parameter):
                     pg2.append(v.bias)  # biases
                 if isinstance(v, nn.BatchNorm2d) or "bn" in k:
-                    if isinstance(v, nn.Identity): # during nndct's QAT, 'bn' is merged to 'conv' and replaced by Identity
+                    if isinstance(
+                        v, nn.Identity
+                    ):  # during nndct's QAT, 'bn' is merged to 'conv' and replaced by Identity
                         continue
                     pg0.append(v.weight)  # no decay
                 elif hasattr(v, "weight") and isinstance(v.weight, nn.Parameter):
@@ -313,7 +324,9 @@ class ExpKITTIDeployQat(BaseExp):
 
         return val_loader
 
-    def get_evaluator(self, batch_size, is_distributed, testdev=False, legacy=False, quantized=False):
+    def get_evaluator(
+        self, batch_size, is_distributed, testdev=False, legacy=False, quantized=False
+    ):
         if quantized:
             from yolox.evaluators import KITTIQEvaluator as KITTIEvaluator
         else:
@@ -332,6 +345,7 @@ class ExpKITTIDeployQat(BaseExp):
     def eval(self, model, evaluator, is_distributed, half=False):
         return evaluator.evaluate(model, is_distributed, half)
 
+
 class ExpDeployQat(BaseExp):
     def __init__(self):
         super().__init__()
@@ -340,7 +354,7 @@ class ExpDeployQat(BaseExp):
         self.num_classes = 80
         self.depth = 1.00
         self.width = 1.00
-        self.act = 'lrelu'
+        self.act = "lrelu"
 
         # ---------------- dataloader config ---------------- #
         # set worker to 4 for shorter dataloader init time
@@ -391,8 +405,8 @@ class ExpDeployQat(BaseExp):
 
         # QAT
         self.is_qat = False
-        self.float_ckpt = ''
-        self.calib_dir = ''
+        self.float_ckpt = ""
+        self.calib_dir = ""
 
     def get_model(self):
         from yolox.models.yolox_deploy import YOLOX
@@ -407,8 +421,12 @@ class ExpDeployQat(BaseExp):
 
         if getattr(self, "model", None) is None:
             in_channels = [256, 512, 1024]
-            backbone = YOLOPAFPN(self.depth, self.width, in_channels=in_channels, act=self.act)
-            head = YOLOXHead(self.num_classes, self.width, in_channels=in_channels, act=self.act)
+            backbone = YOLOPAFPN(
+                self.depth, self.width, in_channels=in_channels, act=self.act
+            )
+            head = YOLOXHead(
+                self.num_classes, self.width, in_channels=in_channels, act=self.act
+            )
             self.model = YOLOX(backbone, head)
 
         self.model.apply(init_yolo)
@@ -417,45 +435,52 @@ class ExpDeployQat(BaseExp):
         if self.is_qat:
             if self.float_ckpt:
                 ckpt = torch.load(self.float_ckpt)
-                print('Loading float model weight for QAT from {}'.format(self.float_ckpt))
+                print(
+                    "Loading float model weight for QAT from {}".format(self.float_ckpt)
+                )
                 self.model.load_state_dict(ckpt["model"])
             dummy_input = torch.randn([1, 3, 640, 640], dtype=torch.float32).cuda()
-            self.qat_processor = QatProcessor(self.model, dummy_input, bitwidth=8, mix_bit=False)
+            self.qat_processor = QatProcessor(
+                self.model, dummy_input, bitwidth=8, mix_bit=False
+            )
             self.model = self.qat_processor.trainable_model(calib_dir=self.calib_dir)
 
         return self.model
 
     def convert_qat(self, qat_model, ckpt_path, cvt_dir):
         print("loading checkpoint from {}".format(ckpt_path))
-        ckpt = torch.load(ckpt_path) 
+        ckpt = torch.load(ckpt_path)
         qat_model.load_state_dict(ckpt["model"])
-        deployable_net = self.qat_processor.convert_to_deployable(qat_model, output_dir=cvt_dir)
+        deployable_net = self.qat_processor.convert_to_deployable(
+            qat_model, output_dir=cvt_dir
+        )
         import copy
+
         cvt_ckpt = copy.deepcopy(ckpt)
         cvt_ckpt["model"] = deployable_net.state_dict()
-        cvt_path = os.path.join(cvt_dir, 'converted_qat.pth')
+        cvt_path = os.path.join(cvt_dir, "converted_qat.pth")
         torch.save(cvt_ckpt, cvt_path)
         print("Save converted QAT results in {}".format(cvt_dir))
 
-#    def get_model(self):
-#        from yolox.models import YOLOX, YOLOXHead
-#        from yolox.models.yolo_pafpn_deploy import YOLOPAFPN
-#
-#        def init_yolo(M):
-#            for m in M.modules():
-#                if isinstance(m, nn.BatchNorm2d):
-#                    m.eps = 1e-3
-#                    m.momentum = 0.03
-#
-#        if getattr(self, "model", None) is None:
-#            in_channels = [256, 512, 1024]
-#            backbone = YOLOPAFPN(self.depth, self.width, in_channels=in_channels, act=self.act)
-#            head = YOLOXHead(self.num_classes, self.width, in_channels=in_channels, act=self.act)
-#            self.model = YOLOX(backbone, head)
-#
-#        self.model.apply(init_yolo)
-#        self.model.head.initialize_biases(1e-2)
-#        return self.model
+    #    def get_model(self):
+    #        from yolox.models import YOLOX, YOLOXHead
+    #        from yolox.models.yolo_pafpn_deploy import YOLOPAFPN
+    #
+    #        def init_yolo(M):
+    #            for m in M.modules():
+    #                if isinstance(m, nn.BatchNorm2d):
+    #                    m.eps = 1e-3
+    #                    m.momentum = 0.03
+    #
+    #        if getattr(self, "model", None) is None:
+    #            in_channels = [256, 512, 1024]
+    #            backbone = YOLOPAFPN(self.depth, self.width, in_channels=in_channels, act=self.act)
+    #            head = YOLOXHead(self.num_classes, self.width, in_channels=in_channels, act=self.act)
+    #            self.model = YOLOX(backbone, head)
+    #
+    #        self.model.apply(init_yolo)
+    #        self.model.head.initialize_biases(1e-2)
+    #        return self.model
 
     def get_data_loader(
         self, batch_size, is_distributed, no_aug=False, cache_img=False
@@ -482,9 +507,8 @@ class ExpDeployQat(BaseExp):
                 json_file=self.train_ann,
                 img_size=self.input_size,
                 preproc=TrainTransform(
-                    max_labels=50,
-                    flip_prob=self.flip_prob,
-                    hsv_prob=self.hsv_prob),
+                    max_labels=50, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+                ),
                 cache=cache_img,
             )
 
@@ -493,9 +517,8 @@ class ExpDeployQat(BaseExp):
             mosaic=not no_aug,
             img_size=self.input_size,
             preproc=TrainTransform(
-                max_labels=120,
-                flip_prob=self.flip_prob,
-                hsv_prob=self.hsv_prob),
+                max_labels=120, flip_prob=self.flip_prob, hsv_prob=self.hsv_prob
+            ),
             degrees=self.degrees,
             translate=self.translate,
             mosaic_scale=self.mosaic_scale,
@@ -536,7 +559,7 @@ class ExpDeployQat(BaseExp):
 
         if rank == 0:
             size_factor = self.input_size[1] * 1.0 / self.input_size[0]
-            if not hasattr(self, 'random_size'):
+            if not hasattr(self, "random_size"):
                 min_size = int(self.input_size[0] / 32) - self.multiscale_range
                 max_size = int(self.input_size[0] / 32) + self.multiscale_range
                 self.random_size = (min_size, max_size)
@@ -576,23 +599,26 @@ class ExpDeployQat(BaseExp):
                 if hasattr(v, "bias") and isinstance(v.bias, nn.Parameter):
                     pg2.append(v.bias)  # biases
                 if isinstance(v, nn.BatchNorm2d) or "bn" in k:
-                    if isinstance(v, nn.Identity): # during nndct's QAT, 'bn' is merged to 'conv' and replaced by Identity
+                    if isinstance(
+                        v, nn.Identity
+                    ):  # during nndct's QAT, 'bn' is merged to 'conv' and replaced by Identity
                         continue
                     pg0.append(v.weight)  # no decay
                 elif hasattr(v, "weight") and isinstance(v.weight, nn.Parameter):
                     pg1.append(v.weight)  # apply decay
 
             threshold = [
-                param for name, param in self.model.named_parameters()
-                if 'threshold' in name
+                param
+                for name, param in self.model.named_parameters()
+                if "threshold" in name
             ]
             print("Threshold params: ")
-            [print(name) for name, param in self.model.named_parameters() if 'threshold' in name]
-            q_param_group = {
-                'params': threshold,
-                'lr': lr * 10,
-                'name': 'threshold'
-            }
+            [
+                print(name)
+                for name, param in self.model.named_parameters()
+                if "threshold" in name
+            ]
+            q_param_group = {"params": threshold, "lr": lr * 10, "name": "threshold"}
 
             optimizer = torch.optim.SGD(
                 pg0, lr=lr, momentum=self.momentum, nesterov=True
@@ -650,7 +676,9 @@ class ExpDeployQat(BaseExp):
 
         return val_loader
 
-    def get_evaluator(self, batch_size, is_distributed, testdev=False, legacy=False, quantized=False):
+    def get_evaluator(
+        self, batch_size, is_distributed, testdev=False, legacy=False, quantized=False
+    ):
         if quantized:
             from yolox.evaluators import COCOQEvaluator as COCOEvaluator
         else:

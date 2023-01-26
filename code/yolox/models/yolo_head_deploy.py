@@ -170,8 +170,22 @@ class YOLOXHead(nn.Module):
 
         # for k, (cls_conv, reg_conv, stride_this_level, x) in enumerate(
         #     zip(self.cls_convs, self.reg_convs, self.strides, xin)
-        for k, (quant_out, q_cat, cls_conv, reg_conv, stride_this_level, x) in enumerate(
-            zip(self.quant_outs, self.cat_list, self.cls_convs, self.reg_convs, self.strides, xin)
+        for k, (
+            quant_out,
+            q_cat,
+            cls_conv,
+            reg_conv,
+            stride_this_level,
+            x,
+        ) in enumerate(
+            zip(
+                self.quant_outs,
+                self.cat_list,
+                self.cls_convs,
+                self.reg_convs,
+                self.strides,
+                xin,
+            )
         ):
             x = self.stems[k](x)
             cls_x = x
@@ -229,7 +243,9 @@ class YOLOXHead(nn.Module):
     def postprocess(self, outputs):
         self.hw = [x.shape[-2:] for x in outputs]
         # [batch, n_anchors_all, 85]
-        outputs = torch.cat([x.flatten(start_dim=2) for x in outputs], dim=2).permute(0, 2, 1)
+        outputs = torch.cat([x.flatten(start_dim=2) for x in outputs], dim=2).permute(
+            0, 2, 1
+        )
         outputs[..., 4:] = outputs[..., 4:].sigmoid()
         if self.decode_in_inference:
             return self.decode_outputs(outputs, dtype=outputs[0].type())
@@ -638,9 +654,7 @@ class YOLOXHead(nn.Module):
         dynamic_ks = torch.clamp(topk_ious.sum(1).int(), min=1)
         dynamic_ks = dynamic_ks.tolist()
         for gt_idx in range(num_gt):
-            _, pos_idx = torch.topk(
-                cost[gt_idx], k=dynamic_ks[gt_idx], largest=False
-            )
+            _, pos_idx = torch.topk(cost[gt_idx], k=dynamic_ks[gt_idx], largest=False)
             matching_matrix[gt_idx][pos_idx] = 1
 
         del topk_ious, dynamic_ks, pos_idx
@@ -662,4 +676,3 @@ class YOLOXHead(nn.Module):
             fg_mask_inboxes
         ]
         return num_fg, gt_matched_classes, pred_ious_this_matching, matched_gt_inds
-

@@ -18,7 +18,16 @@
 
 from torch import nn
 
-from .network_blocks import BaseConv, CSPLayer, Q_CSPLayer, DWConv, FocusDeploy, ResLayer, SPPBottleneck, Q_SPPBottleneck
+from .network_blocks import (
+    BaseConv,
+    CSPLayer,
+    Q_CSPLayer,
+    DWConv,
+    FocusDeploy,
+    ResLayer,
+    SPPBottleneck,
+    Q_SPPBottleneck,
+)
 
 
 class CSPDarknet(nn.Module):
@@ -83,7 +92,12 @@ class CSPDarknet(nn.Module):
         # dark5
         self.dark5 = nn.Sequential(
             Conv(base_channels * 8, base_channels * 16, 3, 2, act=act),
-            Q_SPPBottleneck(base_channels * 16, base_channels * 16, kernel_sizes=(3, 5, 7), activation=act),
+            Q_SPPBottleneck(
+                base_channels * 16,
+                base_channels * 16,
+                kernel_sizes=(3, 5, 7),
+                activation=act,
+            ),
             # CSPLayer(
             Q_CSPLayer(
                 base_channels * 16,

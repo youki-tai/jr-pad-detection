@@ -326,7 +326,7 @@ class FocusDeploy(nn.Module):
 
     def __init__(self, in_channels, out_channels, ksize=1, stride=1, act="silu"):
         super().__init__()
-        self.conv = BaseConv(in_channels, out_channels, ksize, stride*2, act=act)
+        self.conv = BaseConv(in_channels, out_channels, ksize, stride * 2, act=act)
 
     def forward(self, x):
         return self.conv(x)

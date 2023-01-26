@@ -25,7 +25,6 @@ class Exp(MyExp):
         self.max_epoch = 60
         self.data_num_workers = 4
         self.is_qat = True
-        self.float_ckpt = 'YOLOX_outputs/yolox_s_aktio_float/best_ckpt.pth'
+        self.float_ckpt = "YOLOX_outputs/yolox_s_aktio_float/best_ckpt.pth"
         self.eval_interval = 1
-        self.calib_dir = 'quantized'
-        
+        self.calib_dir = "quantized"

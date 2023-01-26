@@ -40,6 +40,6 @@ class Exp(MyExp):
         self.data_num_workers = 4
         self.is_qat = True
         # self.float_ckpt = './best_ckpt.pth'
-        self.float_ckpt = './float/best_ckpt.pth'
+        self.float_ckpt = "./float/best_ckpt.pth"
         self.eval_interval = 1
-        self.calib_dir = 'quantized'
+        self.calib_dir = "quantized"

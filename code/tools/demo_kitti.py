@@ -17,7 +17,8 @@
 # Copyright (c) Megvii, Inc. and its affiliates.
 
 import os
-if os.environ["W_QUANT"]=='1':
+
+if os.environ["W_QUANT"] == "1":
     from pytorch_nndct.apis import torch_quantizer
 
 import argparse
@@ -72,7 +73,9 @@ def make_parser():
     )
     parser.add_argument("--conf", default=0.3, type=float, help="test conf")
     parser.add_argument("--nms", default=0.3, type=float, help="test nms threshold")
-    parser.add_argument("--tsize", default=None, nargs='+', type=int, help="test img size")
+    parser.add_argument(
+        "--tsize", default=None, nargs="+", type=int, help="test img size"
+    )
     parser.add_argument(
         "--fp16",
         dest="fp16",
@@ -126,7 +129,7 @@ class Predictor(object):
         device="cpu",
         fp16=False,
         legacy=False,
-        quant_dir='quantized',
+        quant_dir="quantized",
     ):
         self.model = model
         self.cls_names = cls_names
@@ -149,12 +152,15 @@ class Predictor(object):
             self.model = model_trt
 
         import copy
+
         float_model = copy.deepcopy(model)
-        if os.environ["W_QUANT"]=='1':
-            if device == 'gpu':
-                device = torch.device('cuda')
+        if os.environ["W_QUANT"] == "1":
+            if device == "gpu":
+                device = torch.device("cuda")
             dummy_input = torch.randn([1, 3, 384, 1248]).to(device)
-            quantizer = torch_quantizer('test', model, dummy_input, output_dir=quant_dir, device=device)
+            quantizer = torch_quantizer(
+                "test", model, dummy_input, output_dir=quant_dir, device=device
+            )
             quant_model = quantizer.quant_model
             quant_model.eval()
             self.quant_model = quant_model
@@ -186,7 +192,7 @@ class Predictor(object):
         with torch.no_grad():
             t0 = time.time()
 
-            if os.environ["W_QUANT"]=='1':
+            if os.environ["W_QUANT"] == "1":
                 outputs = self.quant_model(img)
             else:
                 outputs = self.model(img)
@@ -199,8 +205,11 @@ class Predictor(object):
             if self.decoder is not None:
                 outputs = self.decoder(outputs, dtype=outputs.type())
             outputs = postprocess(
-                outputs, self.num_classes, self.confthre,
-                self.nmsthre, class_agnostic=True
+                outputs,
+                self.num_classes,
+                self.confthre,
+                self.nmsthre,
+                class_agnostic=True,
             )
             logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info
@@ -341,10 +350,16 @@ def main(exp, args):
         trt_file = None
         decoder = None
 
-    KITTI_CLASSES = ('Car',)
+    KITTI_CLASSES = ("Car",)
     predictor = Predictor(
-        model, exp, KITTI_CLASSES, trt_file, decoder,
-        args.device, args.fp16, args.legacy,
+        model,
+        exp,
+        KITTI_CLASSES,
+        trt_file,
+        decoder,
+        args.device,
+        args.fp16,
+        args.legacy,
     )
     current_time = time.localtime()
     if args.demo == "image":
