@@ -15,17 +15,26 @@
 # train
 export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
-CFG=exps/example/custom/yolox_m_tt100k_float.py
+# aktio-yolox-s
+CFG=exps/example/custom/yolox_s_aktio_float.py
+# yolox-m
+# CFG=exps/example/custom/yolox_m_tt100k_float.py
 
 # demo
-IMG=../data/tt100k/val2017/27179.jpg
+# aktio-yolo-s
+IMG=aktio_datasets/AKTIO_1202_alldata_COCO_format/val2017/000000000003.jpg
+# yolo-m
+# IMG=datasets/data/tt100k/val2017/27179.jpg
+
 
 # FLOAT DEMO
 export W_QUANT=0 # float model
 echo "float model demo , you can test the float model  or QAT converted model"
-FLOAT_CONVERTED_WEIGHTS=aktio/aktio_sample_1202.pth
+# FLOAT_CONVERTED_WEIGHTS=aktio/aktio_sample_1202.pth
+FLOAT_CONVERTED_WEIGHTS=./YOLOX_outputs/yolox_s_aktio_float/best_ckpt.pth
 
-python tools/demo_sign.py image -f ${CFG} -c ${FLOAT_CONVERTED_WEIGHTS} --path ${IMG} --conf 0.25 --nms 0.45 --tsize 640 640 --save_result --device gpu
+# NOTE: Plz check image size!!
+python tools/demo_sign.py image -f ${CFG} -c ${FLOAT_CONVERTED_WEIGHTS} --path ${IMG} --conf 0.6 --nms 0.45 --tsize 480 640 --save_result --device gpu
 
 # QAUNT DEMO
 #echo "Quant model demo , you can test the QAT model or PTQ model"

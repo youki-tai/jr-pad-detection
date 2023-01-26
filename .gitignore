@@ -1,10 +1,22 @@
 # model files
+*.xmodel
+*.json
+*bin
 *.pth
+
+# generated dirs
+**/.qat
+**/quantized
 **/YOLOX_outputs
+**/aktio-trained-model-*
+**/aktio-yolox-s
+**/aktio_converted_qat
 
 # dataset
+**/*.jpg
 *.zip
 code/datasets/data
+code/aktio_datasets/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -12,7 +24,8 @@ __pycache__/
 *$py.class
 
 # C extensions
-code/*.so
+code/**/*.so
+
 
 # Distribution / packaging
 .Python
