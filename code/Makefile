@@ -5,7 +5,6 @@ GPU_NUM=1
 
 # train(float) ---------------------------------------------------
 FLOAT_BATCH_SIZE=8
-# float
 FLOAT_CFG=exps/aktio/vitis_ai_yolox/yolox_s_float.py
 FLOAT_EXPERIMENT_NAME=vitis_ai_yolox_s_float
 
@@ -17,31 +16,18 @@ PTQ_DIR=quantized
 
 # QAT ------------------------------------------------------------
 QAT_BATCH_SIZE=4
-# Aktio YOLOX-s
 QAT_CFG=exps/aktio/vitis_ai_yolox/yolox_s_qat.py
 QAT_EXPERIMENT_NAME=vitis_ai_yolox_s_qat
 
 # eval -----------------------------------------------------------
+# NOTE: CFG can be for both float and qat.
 EVAL_BATCH_SIZE=16
-# aktio official yolox-s
 EVAL_CFG=exps/aktio/yolox_s_float.py
-# Vitis AI YOLOX-m specification
-# EVAL_CFG=exps/example/custom/yolox_m_tt100k_float.py
-# float
-# WEIGHTS=./YOLOX_outputs/yolox_s_aktio_float/best_ckpt.pth
-# qat
-EVAL_WEIGHTS=./YOLOX_outputs/yolox_s_aktio_qat/best_ckpt.pth
+EVAL_WEIGHTS=./aktio-trained-model-2023-01-26/yolox_s_aktio_qat/best_ckpt.pth
 
 # compile -----------------------------------------------------------
 QAT_WEIGHTS=YOLOX_outputs/yolox_s_aktio_qat/best_ckpt.pth
 CVT_DIR=aktio_converted_qat
-
-
-hello: MODE=world
-hello:
-	echo "HELLO"
-
-	echo ${MODE}/hello
 
 
 train:
