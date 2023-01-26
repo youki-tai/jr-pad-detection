@@ -13,6 +13,7 @@
 **/aktio_converted_qat
 
 # dataset
+*.mp4
 **/*.jpg
 *.zip
 code/datasets/data
