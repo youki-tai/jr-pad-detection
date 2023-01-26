@@ -153,7 +153,7 @@ class Predictor(object):
         if os.environ["W_QUANT"]=='1':
             if device == 'gpu':
                 device = torch.device('cuda')
-            dummy_input = torch.randn([1, 3, 640, 640]).to(device)
+            dummy_input = torch.randn([1, 3, exp.test_size[0], exp.test_size[1]]).to(device)
             quantizer = torch_quantizer('test', model, dummy_input, output_dir=quant_dir, device=device)
             quant_model = quantizer.quant_model
             quant_model.eval()
