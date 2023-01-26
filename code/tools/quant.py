@@ -194,7 +194,8 @@ def main(exp, args, num_gpu):
     import copy
     float_model = copy.deepcopy(model)
     if os.environ["W_QUANT"]=='1':
-        dummy_input = torch.randn([1, 3, 640, 640]).to(device)
+        # TODO: assign via argment
+        dummy_input = torch.randn([1, 3, 480, 640]).to(device)
         quantizer = torch_quantizer(args.quant_mode, model, dummy_input, output_dir=args.quant_dir, device=device)
         model = quantizer.quant_model
         model.eval()
