@@ -4,20 +4,20 @@ export CUDA_VISIBLE_DEVICES=0
 GPU_NUM=1
 
 # train(float) ---------------------------------------------------
-FLOAT_BATCH_SIZE=8
-FLOAT_CFG=exps/aktio/vitis_ai_yolox/yolox_s_float.py
-FLOAT_EXPERIMENT_NAME=vitis_ai_yolox_s_float
+FLOAT_BATCH_SIZE=64
+FLOAT_CFG=exps/aktio/vitis_ai_yolox/yolox_nano_float.py
+FLOAT_EXPERIMENT_NAME=vitis_ai_yolox_nano_float
 
 # PTQ ------------------------------------------------------------
 PTQ_BATCH=8
-PTQ_CFG=exps/aktio/vitis_ai_yolox/yolox_s_quant.py
-PTQ_WEIGHTS=aktio-trained-model-2023-01-26/yolox_s_aktio_float/best_ckpt.pth
-PTQ_EXPERIMENT_NAME=vitis_ai_yolox_s_ptq
-PTQ_DIR=quantized
+PTQ_CFG=exps/aktio/vitis_ai_yolox/yolox_nano_quant.py
+PTQ_WEIGHTS=YOLOX_outputs/${FLOAT_EXPERIMENT_NAME}/best_ckpt.pth
+PTQ_EXPERIMENT_NAME=vitis_ai_yolox_nano_ptq
+PTQ_DIR=quantized_vitis_ai_yolox_nano
 
 # QAT ------------------------------------------------------------
 QAT_BATCH_SIZE=4
-QAT_CFG=exps/aktio/vitis_ai_yolox/yolox_s_qat.py
+QAT_CFG=exps/aktio/vitis_ai_yolox/yolox_nano_qat.py
 QAT_EXPERIMENT_NAME=vitis_ai_yolox_s_qat
 
 # eval -----------------------------------------------------------
@@ -78,8 +78,8 @@ compile:
 	python tools/convert_qat.py -f ${QAT_CFG} -c ${QAT_WEIGHTS} --cvt_dir ${CVT_DIR}
 
 	echo "test converted qat model"
-	python tools/quant.py -f ${PTQ_CFG} -c ${Q_DIR}/converted_qat.pth -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode test --quant_dir ${CVT_DIR} --nndct_equalization=False --nndct_param_corr=False
+	python tools/quant.py -f ${PTQ_CFG} -c ${PTQ_DIR}/converted_qat.pth -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode test --quant_dir ${CVT_DIR} --nndct_equalization=False --nndct_param_corr=False
 		
 	echo "dump xmodel for deployment"
-	python tools/quant.py -f ${PTQ_CFG} -c ${Q_DIR}/converted_qat.pth -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode test --quant_dir ${CVT_DIR} --is_dump --nndct_equalization=False --nndct_param_corr=False
+	python tools/quant.py -f ${PTQ_CFG} -c ${PTQ_DIR}/converted_qat.pth -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode test --quant_dir ${CVT_DIR} --is_dump --nndct_equalization=False --nndct_param_corr=False
 
