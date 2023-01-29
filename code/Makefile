@@ -18,7 +18,7 @@ PTQ_DIR=quantized_vitis_ai_yolox_nano
 # QAT ------------------------------------------------------------
 QAT_BATCH_SIZE=4
 QAT_CFG=exps/aktio/vitis_ai_yolox/yolox_nano_qat.py
-QAT_EXPERIMENT_NAME=vitis_ai_yolox_s_qat
+QAT_EXPERIMENT_NAME=vitis_ai_yolox_nano_qat
 
 # eval -----------------------------------------------------------
 # NOTE: CFG can be for both float and qat.
@@ -42,9 +42,9 @@ CONFIDENCE=0.6
 NMS=0.45
 
 # compile -----------------------------------------------------------
-QAT_WEIGHTS=YOLOX_outputs/yolox_s_aktio_qat/best_ckpt.pth
-CVT_DIR=aktio_converted_qat
-
+QAT_WEIGHTS=YOLOX_outputs/${QAT_EXPERIMENT_NAME}/best_ckpt.pth
+COMPILE_DIR=aktio_converted_qat
+COMPILE_BATCHSIZE=16
 
 train:
 	python tools/train.py -expn ${FLOAT_EXPERIMENT_NAME} -f ${FLOAT_CFG} -b ${FLOAT_BATCH_SIZE} -d ${GPU_NUM} --fp16
@@ -75,11 +75,11 @@ eval:
 compile: export W_QUANT=1
 compile:
 	echo "converted qat model"
-	python tools/convert_qat.py -f ${QAT_CFG} -c ${QAT_WEIGHTS} --cvt_dir ${CVT_DIR}
+	python tools/convert_qat.py -f ${QAT_CFG} -c ${QAT_WEIGHTS} --cvt_dir ${COMPILE_DIR}
 
 	echo "test converted qat model"
-	python tools/quant.py -f ${PTQ_CFG} -c ${PTQ_DIR}/converted_qat.pth -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode test --quant_dir ${CVT_DIR} --nndct_equalization=False --nndct_param_corr=False
+	python tools/quant.py -f ${PTQ_CFG} -c ${COMPILE_DIR}/converted_qat.pth -b ${COMPILE_BATCHSIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode test --quant_dir ${PTQ_DIR} --nndct_equalization=False --nndct_param_corr=False
 		
 	echo "dump xmodel for deployment"
-	python tools/quant.py -f ${PTQ_CFG} -c ${PTQ_DIR}/converted_qat.pth -b ${BATCH_SIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode test --quant_dir ${CVT_DIR} --is_dump --nndct_equalization=False --nndct_param_corr=False
+	python tools/quant.py -f ${PTQ_CFG} -c ${COMPILE_DIR}/converted_qat.pth -b ${COMPILE_BATCHSIZE} -d ${GPU_NUM} --conf 0.001 --quant_mode test --quant_dir ${PTQ_DIR} --is_dump --nndct_equalization=False --nndct_param_corr=False
 
