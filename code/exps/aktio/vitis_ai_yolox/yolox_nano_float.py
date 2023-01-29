@@ -9,11 +9,13 @@ class Exp(MyExp):
         self.depth = 0.33
         self.width = 0.25
         self.depthwise = True
+        self.mosaic_scale = (0.5, 1.5)
+        self.random_size = (10, 20)
+        self.mosaic_prob = 0.5
 
         self.input_size = (480, 640)
         self.test_size = (480, 640)
-        self.mosaic_scale = (0.5, 1.5)
-        self.random_size = (10, 20)
+
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         self.enable_mixup = False
 
