@@ -47,8 +47,9 @@ pip install --user -v -e .
 
 ### 4. Modify experiment settings
 `/workspace/aktio-yolox/code`ディレクトリにある`Makefile`に実験の設定を記述する. 
-`CFG`とはモデル定義とepoch等の実験設定が記載されている. 実装済みのモデル定義一覧はこちら
-- https://github.com/tokyo-ai/aktio-yolox/issues/21
+各用語
+- `CFG`: モデル定義とepoch等の実験設定が記載されている. 実装済みのモデル定義一覧は[こちら](https://github.com/tokyo-ai/aktio-yolox/issues/21)
+- `EXPERIMENT_NAME`: 結果が`YOLO_outputs/{EXPERIMENT_NAME}/*`に出力される. 
 
 設定後, たとえば`float`での学習の際には
 ```
