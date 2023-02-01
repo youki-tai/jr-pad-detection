@@ -55,9 +55,9 @@ pip install --user -v -e .
 ```
 make train
 ```
-を実行する. 学習, 評価, デモ, コンパイルが同じ方法で実行可能. 
-**[注意]**コンパイル前にパッチを当ててください
-https://github.com/tokyo-ai/aktio-yolox/issues/2#issuecomment-1383558678
+を実行する. 学習, 評価, デモ, コンパイルが同じ方法で実行可能.   
+**[注意]** コンパイル前にパッチを当ててください
+https://github.com/tokyo-ai/aktio-yolox/issues/2#issuecomment-1383558678  
 学習データセットは誰かからもらってください. 
 
 
