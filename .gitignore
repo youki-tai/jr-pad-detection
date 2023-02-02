@@ -11,6 +11,8 @@
 **/aktio-trained-model-*
 **/aktio-yolox-s
 **/aktio_converted_qat
+**/quantized_vitis_ai_yolox_s
+**/compiled-yolox-s
 
 # dataset
 *.mp4
