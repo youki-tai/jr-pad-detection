@@ -55,11 +55,15 @@ pip install --user -v -e .
 ```
 make train
 ```
-を実行する. 学習, 評価, デモ, コンパイルが同じ方法で実行可能.   
-**[注意]** コンパイル前にパッチを当ててください
-https://github.com/tokyo-ai/aktio-yolox/issues/2#issuecomment-1383558678  
-学習データセットは誰かからもらってください. 
-
+を実行する. 学習データセットは誰かからもらってください.   
+流れとしては以下を想定
+1. floatで学習: `make train`
+2. ptqをしてキャリブレーション: `make ptq`
+3. qat: `make qat`
+4. floatやqatの結果をデモ: `make demo`
+5. qatの学習済み重みを`*.xmodel`形式でダンプ: `make dump`
+6. パッチを当てる: `make patch`
+7. DPU向けにコンパイル: `make compile`
 
 ## Documents
 - [Environment Settings(Install GPU Driver + Docker & Build Vitis AI Docker Image)](https://github.com/tokyo-ai/aktio-yolovx/issues/1)
