@@ -62,7 +62,7 @@ make train
 3. qat: `make qat`
 4. floatやqatの結果をデモ: `make demo`
 5. qatの学習済み重みを`*.xmodel`形式でダンプ: `make dump`
-6. パッチを当てる: `make patch`
+6. パッチを当てる(コンパイル前に必須): `make patch`
 7. DPU向けにコンパイル: `make compile`
 
 ## Documents
