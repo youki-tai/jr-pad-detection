@@ -243,22 +243,20 @@ def main():
     # parser.add_argument('--image_dirname', required=True, type=str)
     # parser.add_argument('--image_filename_prefix', default=None, type=str, help="used to complement the image path during readin")
     # parser.add_argument('--txt_filename_prefix', default=None, type=str, help="used to complement the label path during readin")
-    parser.add_argument(
-        "--label_dirname", default="annotations", type=str, help="output dir name"
-    )
-    parser.add_argument(
-        "--gt_json_filename", required=True, type=str, help="gt filename"
-    )
+    parser.add_argument("--label_dirname", default="annotations", type=str, help="output dir name")
+    #parser.add_argument("--gt_json_filename", required=True, type=str, help="gt filename")
     args = parser.parse_args()
 
     print("Start Split the dataset and Convert to yolo")
-    splitTT100_and_convert(args.gt_json_filename)
+    #splitTT100_and_convert(args.gt_json_filename)
 
-    for dataset_type in ["train", "test"]:
+    #for dataset_type in ["train", "test"]:
+    for dataset_type in ["image2"]:
         image_dirname = dataset_type
         label_filename = "tt100k_in_coco_format_" + dataset_type + ".json"
         image_filename_prefix = dataset_type
         txt_filename_prefix = dataset_type
+        txt_filename_prefix = "label2"
         image_dir = os.path.join(args.work_dir, image_dirname)
         label_dir = os.path.join(args.work_dir, args.label_dirname)
         os.makedirs(label_dir, exist_ok=True)

@@ -27,6 +27,7 @@ import torch
 
 from yolox.data.data_augment import ValTransform
 from yolox.data.datasets import COCO_CLASSES
+COCO_CLASSES = ("fastener", "pad")
 from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess, vis
 
@@ -172,12 +173,11 @@ class Predictor(object):
             outputs = self.model(img)
             if self.decoder is not None:
                 outputs = self.decoder(outputs, dtype=outputs.type())
+            if isinstance(outputs, (list, tuple)):
+                outputs = self.model.head.postprocess(outputs)
             outputs = postprocess(
-                outputs,
-                self.num_classes,
-                self.confthre,
-                self.nmsthre,
-                class_agnostic=True,
+                outputs, self.num_classes, self.confthre,
+                self.nmsthre, class_agnostic=True
             )
             logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info
@@ -196,6 +196,7 @@ class Predictor(object):
 
         cls = output[:, 6]
         scores = output[:, 4] * output[:, 5]
+        import pdb;pdb.set_trace()
 
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
         return vis_res
@@ -277,6 +278,7 @@ def main(exp, args):
         exp.nmsthre = args.nms
     if args.tsize is not None:
         exp.test_size = (args.tsize, args.tsize)
+        exp.test_size = (480, 640)
 
     model = exp.get_model()
     logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
@@ -316,14 +318,8 @@ def main(exp, args):
         decoder = None
 
     predictor = Predictor(
-        model,
-        exp,
-        COCO_CLASSES,
-        trt_file,
-        decoder,
-        args.device,
-        args.fp16,
-        args.legacy,
+        model, exp, COCO_CLASSES, trt_file, decoder,
+        args.device, args.fp16, args.legacy,
     )
     current_time = time.localtime()
     if args.demo == "image":

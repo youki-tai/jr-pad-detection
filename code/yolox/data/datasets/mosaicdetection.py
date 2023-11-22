@@ -20,8 +20,9 @@ import random
 
 import cv2
 import numpy as np
+import torch
 
-from yolox.utils import adjust_box_anns, get_local_rank
+from yolox.utils import adjust_box_anns, get_local_rank, vis
 
 from ..data_augment import random_affine
 from .datasets_wrapper import Dataset
@@ -195,8 +196,48 @@ class MosaicDetection(Dataset):
             # img_info and img_id are not used for training.
             # They are also hard to be specified on a mosaic image.
             # -----------------------------------------------------------------
+            
             return mix_img, padded_labels, img_info, img_id
 
+        elif 1:
+            new_input_dim = (self.input_dim[0]*2, self.input_dim[1])
+            idx1 = random.randint(0, len(self._dataset) - 1)
+            self._dataset._input_dim = self.input_dim
+            img0, label0, img_info0, img_id0 = self._dataset.pull_item(idx)
+            img1, label1, img_info1, img_id1 = self._dataset.pull_item(idx1)
+            padh = img0.shape[0]
+            if label1.size > 0:
+                label1[:, 1] += padh
+                label1[:, 3] += padh
+                label = np.concatenate([label0, label1], 0)
+            else:
+                label = label0
+            img = np.concatenate([img0, img1], 0)
+            img, label = self.preproc(img, label, new_input_dim)
+            self._dataset._input_dim = new_input_dim
+            if 0:
+                boxes = label[:,1:]
+                boxes = boxes[boxes.sum(1)>0]
+                bboxes = np.zeros_like(boxes)
+                bboxes[:, 0] = boxes[:, 0] - boxes[:, 2] / 2
+                bboxes[:, 1] = boxes[:, 1] - boxes[:, 3] / 2
+                bboxes[:, 2] = boxes[:, 0] + boxes[:, 2] / 2
+                bboxes[:, 3] = boxes[:, 1] + boxes[:, 3] / 2
+
+                cls = label[:,:1]
+                scores = np.ones(cls.size)
+
+                tmp = img
+                tmp = tmp-tmp.min()
+                tmp = tmp/tmp.max() * 255.0
+                tmp = tmp.astype('uint8').transpose(1,2,0).copy()
+                vis_res = np.array(vis(tmp, bboxes, scores, cls, class_names=("0", "1")))
+                import matplotlib
+                matplotlib.use('Qt5Agg')
+                from matplotlib import pylab as plt
+                plt.imshow(vis_res)
+                plt.show()
+            return img, label, img_info0, img_id0
         else:
             self._dataset._input_dim = self.input_dim
             img, label, img_info, img_id = self._dataset.pull_item(idx)

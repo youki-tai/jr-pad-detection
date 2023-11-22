@@ -25,6 +25,7 @@ from pycocotools.coco import COCO
 
 from ..dataloading import get_yolox_datadir
 from .datasets_wrapper import Dataset
+from yolox.utils import vis
 
 
 class COCODataset(Dataset):
@@ -222,6 +223,21 @@ class COCODataset(Dataset):
             img_id (int): same as the input index. Used for evaluation.
         """
         img, target, img_info, img_id = self.pull_item(index)
+        if 0:
+            bboxes = target[:,:-1].copy()
+            cls = target[:,-1:]
+            scores = np.ones(cls.size)
+
+            tmp = img
+            tmp = tmp-tmp.min()
+            tmp = tmp/tmp.max() * 255.0
+            tmp = tmp.astype('uint8')
+            vis_res = np.array(vis(tmp, bboxes, scores, cls, class_names=("0", "1")))
+            import matplotlib
+            matplotlib.use('Qt5Agg')
+            from matplotlib import pylab as plt
+            plt.imshow(vis_res)
+            plt.show()
 
         if self.preproc is not None:
             img, target = self.preproc(img, target, self.input_dim)
