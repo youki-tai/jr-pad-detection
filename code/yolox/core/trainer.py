@@ -106,6 +106,17 @@ class Trainer:
 
         inps, targets = self.prefetcher.next()
         inps = inps.to(self.data_type)
+        
+        if 0:
+            import matplotlib
+            matplotlib.use('Qt5Agg')
+            from matplotlib import pylab as plt
+            import numpy as np
+            tmp = inps[0].detach().cpu().numpy()
+            tmp = tmp-tmp.min()
+            tmp = tmp/tmp.max() * 255.0
+            plt.imshow(tmp.astype(np.uint8).transpose(1,2,0))
+            plt.show()
         targets = targets.to(self.data_type)
         targets.requires_grad = False
         inps, targets = self.exp.preprocess(inps, targets, self.input_size)
@@ -127,6 +138,9 @@ class Trainer:
         lr = self.lr_scheduler.update_lr(self.progress_in_iter + 1)
         for param_group in self.optimizer.param_groups:
             param_group["lr"] = lr
+
+        if self.rank == 0 and self.progress_in_iter%10==0:
+            self.tblogger.add_scalar("train/lr", lr, self.progress_in_iter + 1)
 
         iter_end_time = time.time()
         self.meter.update(
