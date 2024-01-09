@@ -12,3 +12,6 @@ all:
 	   -lopencv_imgcodecs \
 	   -lopencv_highgui \
 	   -lvitis_ai_library-yolovx
+clean:
+	rm vitis_ai_yolovx_wr$(SUFFIX)
+
